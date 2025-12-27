@@ -6,16 +6,21 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
+
+	validatorUtil "tytan-api/util/validator"
 )
 
 type API struct {
+	validator  *validator.Validate
 	repository *UserRepository
 	db         *sql.DB
 }
 
-func NewUserHandler(db *sql.DB) *API {
+func NewUserHandler(validator *validator.Validate, db *sql.DB) *API {
 	return &API{
+		validator:  validator,
 		repository: NewUserRepository(db),
 		db:         db,
 	}
@@ -53,6 +58,12 @@ func (a *API) Create(w http.ResponseWriter, r *http.Request) {
 
 	userForm := &UserForm{}
 	_ = json.NewDecoder(r.Body).Decode(&userForm)
+
+	if err := a.validator.Struct(userForm); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(validatorUtil.ToErrResponse(err))
+		return
+	}
 
 	if err := a.repository.Create(ToUserModel(userForm)); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -99,6 +110,12 @@ func (a *API) Update(w http.ResponseWriter, r *http.Request) {
 
 	var userForm *UserForm
 	_ = json.NewDecoder(r.Body).Decode(&userForm)
+
+	if err := a.validator.Struct(userForm); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(validatorUtil.ToErrResponse(err))
+		return
+	}
 
 	if err := a.repository.Update(id, ToUserModel(userForm)); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

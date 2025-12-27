@@ -2,18 +2,20 @@ package router
 
 import (
 	"database/sql"
-	"go/main/api/resource/health"
-	"go/main/api/resource/user"
+	"tytan-api/api/resource/health"
+	"tytan-api/api/resource/user"
+
+	"github.com/go-playground/validator/v10"
 
 	"github.com/gorilla/mux"
 )
 
-func NewRouter(db *sql.DB) *mux.Router {
+func NewRouter(validator *validator.Validate, db *sql.DB) *mux.Router {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/health", health.Check).Methods("GET")
 
-	userHandler := user.NewUserHandler(db)
+	userHandler := user.NewUserHandler(validator, db)
 	r.HandleFunc("/users", userHandler.List).Methods("GET")
 	r.HandleFunc("/users/{id}", userHandler.Read).Methods("GET")
 	r.HandleFunc("/users", userHandler.Create).Methods("POST")

@@ -2,8 +2,9 @@ package main
 
 import (
 	"database/sql"
-	"go/main/api/router"
 	"net/http"
+	"tytan-api/api/router"
+	"tytan-api/util/validator"
 
 	_ "modernc.org/sqlite"
 )
@@ -25,6 +26,9 @@ func main() {
 
 	defer db.Close()
 
-	r := router.NewRouter(db)
-	http.ListenAndServe(":8080", r)
+	router := router.NewRouter(
+		validator.New(),
+		db,
+	)
+	http.ListenAndServe(":8080", router)
 }
