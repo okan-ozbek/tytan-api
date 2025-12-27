@@ -2,6 +2,7 @@ package user
 
 import (
 	"time"
+	hashUtil "tytan-api/util/hash"
 )
 
 type UserDTO struct {
@@ -31,9 +32,14 @@ func ToUserDTO(user *User) *UserDTO {
 }
 
 func ToUserModel(form *UserForm) *User {
+	password, err := hashUtil.Hash(form.Password)
+	if err != nil {
+		return nil
+	}
+
 	return &User{
 		Username:  form.Username,
-		Password:  form.Password,
+		Password:  password,
 		CreatedAt: time.Now(),
 	}
 }
