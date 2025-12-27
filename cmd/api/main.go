@@ -4,13 +4,16 @@ import (
 	"database/sql"
 	"net/http"
 	"tytan-api/api/router"
+	"tytan-api/config"
 	"tytan-api/util/validator"
 
 	_ "modernc.org/sqlite"
 )
 
 func main() {
-	db, err := sql.Open("sqlite", "file:database.db?mode=memory&cache=shared")
+	config := config.LoadConfig()
+
+	db, err := sql.Open(config.Database.Driver, "file:"+config.Database.Host+"?mode=memory&cache=shared")
 	if err != nil {
 		panic(err)
 	}
