@@ -33,5 +33,5 @@ func main() {
 		validator.New(),
 		db,
 	)
-	http.ListenAndServe(":8080", router)
+	http.ListenAndServe(":"+config.Server.Port, router)
 }
