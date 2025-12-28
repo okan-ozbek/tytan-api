@@ -2,10 +2,10 @@ package router
 
 import (
 	"database/sql"
-	"tytan-api/api/resource/food"
-	"tytan-api/api/resource/health"
-	"tytan-api/api/resource/user"
-	"tytan-api/api/router/middleware"
+	"tytan-api/internal/resource/food"
+	"tytan-api/internal/resource/health"
+	"tytan-api/internal/resource/user"
+	"tytan-api/internal/router/middleware"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"

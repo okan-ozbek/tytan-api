@@ -3,7 +3,7 @@ package user
 import (
 	"database/sql"
 
-	hashUtil "tytan-api/util/hash"
+	hashUtil "tytan-api/internal/util/hash"
 )
 
 type UserRepository struct {

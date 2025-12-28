@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
-	"tytan-api/api/resource/user"
+	"tytan-api/internal/resource/user"
 
 	"github.com/go-playground/validator/v10"
 

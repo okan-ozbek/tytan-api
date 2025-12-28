@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 
-	validatorUtil "tytan-api/util/validator"
+	validatorUtil "tytan-api/internal/util/validator"
 )
 
 type API struct {
@@ -117,7 +117,7 @@ func (a *API) Read(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := a.repository.Read(id)
+	user, err := a.repository.FindById(id)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode("User not found")

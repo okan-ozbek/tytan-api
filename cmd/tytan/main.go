@@ -3,9 +3,9 @@ package main
 import (
 	"database/sql"
 	"net/http"
-	"tytan-api/api/router"
 	"tytan-api/config"
-	"tytan-api/util/validator"
+	"tytan-api/internal/router"
+	"tytan-api/internal/util/validator"
 
 	_ "modernc.org/sqlite"
 )

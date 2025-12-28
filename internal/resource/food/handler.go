@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"strconv"
 
-	validatorUtil "tytan-api/util/validator"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
+
+	validatorUtil "tytan-api/internal/util/validator"
 )
 
 type API struct {
