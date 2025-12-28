@@ -25,10 +25,18 @@ type ServerConfig struct {
 	TimeoutWrite string
 	TimeoutIdle  string
 	Debug        string
+	Secret       string
 }
 
 func LoadConfig() *Config {
-	databaseConfig := DatabaseConfig{
+	return &Config{
+		Database: *LoadDatabaseConfig(),
+		Server:   *LoadServerConfig(),
+	}
+}
+
+func LoadDatabaseConfig() *DatabaseConfig {
+	return &DatabaseConfig{
 		Driver:   getEnv("DB_DRIVER", "sqlite"),
 		Host:     getEnv("DB_HOST", ""),
 		Port:     getEnv("DB_PORT", ""),
@@ -36,18 +44,16 @@ func LoadConfig() *Config {
 		Password: getEnv("DB_PASSWORD", ""),
 		Name:     getEnv("DB_NAME", ""),
 	}
+}
 
-	serverConfig := ServerConfig{
+func LoadServerConfig() *ServerConfig {
+	return &ServerConfig{
 		Port:         getEnv("SERVER_PORT", "8080"),
 		TimeoutRead:  getEnv("SERVER_TIMEOUT_READ", "15s"),
 		TimeoutWrite: getEnv("SERVER_TIMEOUT_WRITE", "15s"),
 		TimeoutIdle:  getEnv("SERVER_TIMEOUT_IDLE", "60s"),
 		Debug:        getEnv("SERVER_DEBUG", "false"),
-	}
-
-	return &Config{
-		Database: databaseConfig,
-		Server:   serverConfig,
+		Secret:       getEnv("SERVER_SECRET", "secret"),
 	}
 }
 

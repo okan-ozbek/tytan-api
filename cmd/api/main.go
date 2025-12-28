@@ -5,14 +5,17 @@ import (
 	"net/http"
 	"tytan-api/api/router"
 	"tytan-api/config"
+	"tytan-api/util/auth"
 	"tytan-api/util/validator"
 
 	_ "modernc.org/sqlite"
 )
 
 func main() {
+	auth.NewAuth()
 	config := config.LoadConfig()
 
+	// db, err := sql.Open("sqlite", "file:database.db?cache=shared")
 	db, err := sql.Open(config.Database.Driver, "file:"+config.Database.Host+"?mode=memory&cache=shared")
 	if err != nil {
 		panic(err)
@@ -49,5 +52,7 @@ func main() {
 		validator.New(),
 		db,
 	)
-	http.ListenAndServe(":"+config.Server.Port, router)
+
+	http.ListenAndServe(":8080", router)
+	//http.ListenAndServe(":"+config.Server.Port, router)
 }
