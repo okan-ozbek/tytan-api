@@ -33,14 +33,12 @@ func main() {
 		panic(err)
 	}
 
-	_, err = db.Exec(`
-		CREATE IF EXISTS TABLE foods (
-			id AUTOINCREMENT PRIMARY KEY,
-			name VARCHAR(100) NOT NULL,
-			description TEXT,
-			created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-			updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-		);`)
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS foods (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT,
+		description TEXT,
+		created_at DATETIME
+	);`)
 	if err != nil {
 		panic(err)
 	}

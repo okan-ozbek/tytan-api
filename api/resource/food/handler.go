@@ -37,20 +37,20 @@ func NewFoodHandler(validator *validator.Validate, db *sql.DB) *API {
 func (a *API) List(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	foods, err := a.repository.List()
+	users, err := a.repository.List()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("Failed to retrieve foods")
 		return
 	}
 
-	if len(foods) == 0 {
+	if len(users) == 0 {
 		json.NewEncoder(w).Encode([]*FoodDTO{})
 		return
 	}
 
-	dtos := make([]*FoodDTO, len(foods))
-	for i, v := range foods {
+	dtos := make([]*FoodDTO, len(users))
+	for i, v := range users {
 		dtos[i] = ToFoodDTO(v)
 	}
 
@@ -59,8 +59,6 @@ func (a *API) List(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("Failed to encode foods")
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
 // Create godoc
@@ -77,32 +75,22 @@ func (a *API) List(w http.ResponseWriter, r *http.Request) {
 func (a *API) Create(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var dto FoodDTO
-	if err := json.NewDecoder(r.Body).Decode(&dto); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("Invalid request payload")
-		return
-	}
+	foodForm := &FoodForm{}
+	_ = json.NewDecoder(r.Body).Decode(&foodForm)
 
-	if err := a.validator.Struct(dto); err != nil {
+	if err := a.validator.Struct(foodForm); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(validatorUtil.ToErrResponse(err))
 		return
 	}
 
-	food := ToFoodModel(&FoodForm{
-		Name:        dto.Name,
-		Description: dto.Description,
-	})
-
-	if err := a.repository.Create(food); err != nil {
+	if err := a.repository.Create(ToFoodModel(foodForm)); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("Failed to create food")
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode("Food created successfully")
 }
 
 // Read godoc
@@ -166,12 +154,8 @@ func (a *API) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var foodForm FoodForm
-	if err := json.NewDecoder(r.Body).Decode(&foodForm); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode("Invalid request payload")
-		return
-	}
+	var foodForm *FoodForm
+	_ = json.NewDecoder(r.Body).Decode(&foodForm)
 
 	if err := a.validator.Struct(foodForm); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -179,8 +163,7 @@ func (a *API) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	food := ToFoodModel(&foodForm)
-	if err := a.repository.Update(id, food); err != nil {
+	if err := a.repository.Update(id, ToFoodModel(foodForm)); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("Failed to update food")
 		return

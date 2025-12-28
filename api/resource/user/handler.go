@@ -125,6 +125,8 @@ func (a *API) Read(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to encode user", http.StatusInternalServerError)
 		return
 	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 // Update godoc
@@ -188,8 +190,7 @@ func (a *API) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = a.db.Exec("DELETE FROM user WHERE id = ?", id)
-	if err != nil {
+	if err := a.repository.Delete(id); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("Failed to delete user")
 		return

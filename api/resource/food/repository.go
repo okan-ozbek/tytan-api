@@ -13,7 +13,7 @@ func NewFoodRepository(db *sql.DB) *FoodRepository {
 }
 
 func (r *FoodRepository) List() ([]*Food, error) {
-	rows, err := r.DB.Query("SELECT id, name, description FROM food")
+	rows, err := r.DB.Query("SELECT id, name, description, created_at FROM foods")
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +22,7 @@ func (r *FoodRepository) List() ([]*Food, error) {
 	var foods []*Food
 	for rows.Next() {
 		food := &Food{}
-		if err := rows.Scan(&food.ID, &food.Name, &food.Description); err != nil {
+		if err := rows.Scan(&food.ID, &food.Name, &food.Description, &food.CreatedAt); err != nil {
 			return nil, err
 		}
 		foods = append(foods, food)
@@ -32,16 +32,17 @@ func (r *FoodRepository) List() ([]*Food, error) {
 
 func (r *FoodRepository) Create(food *Food) error {
 	_, err := r.DB.Exec(
-		"INSERT INTO food (name, description) VALUES (?, ?)",
+		"INSERT INTO foods (name, description, created_at) VALUES (?, ?, ?)",
 		food.Name,
 		food.Description,
+		food.CreatedAt,
 	)
 
 	return err
 }
 
 func (r *FoodRepository) Read(id int) (*Food, error) {
-	row := r.DB.QueryRow("SELECT id, name, description FROM food WHERE id = ?", id)
+	row := r.DB.QueryRow("SELECT id, name, description FROM foods WHERE id = ?", id)
 	food := &Food{}
 	err := row.Scan(&food.ID, &food.Name, &food.Description)
 	if err != nil {
@@ -53,15 +54,16 @@ func (r *FoodRepository) Read(id int) (*Food, error) {
 
 func (r *FoodRepository) Update(id int, food *Food) error {
 	_, err := r.DB.Exec(
-		"UPDATE food SET name = ?, description = ? WHERE id = ?",
+		"UPDATE foods SET name = ?, description = ?, created_at = ? WHERE id = ?",
 		food.Name,
 		food.Description,
+		food.CreatedAt,
 		id,
 	)
 	return err
 }
 
 func (r *FoodRepository) Delete(id int) error {
-	_, err := r.DB.Exec("DELETE FROM food WHERE id = ?", id)
+	_, err := r.DB.Exec("DELETE FROM foods WHERE id = ?", id)
 	return err
 }

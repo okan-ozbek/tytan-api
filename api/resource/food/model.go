@@ -1,8 +1,11 @@
 package food
 
+import "time"
+
 type FoodDTO struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type FoodForm struct {
@@ -14,6 +17,7 @@ type Food struct {
 	ID          int
 	Name        string
 	Description string
+	CreatedAt   time.Time
 }
 
 func ToFoodDTO(food *Food) *FoodDTO {
@@ -27,5 +31,6 @@ func ToFoodModel(form *FoodForm) *Food {
 	return &Food{
 		Name:        form.Name,
 		Description: form.Description,
+		CreatedAt:   time.Now(),
 	}
 }
