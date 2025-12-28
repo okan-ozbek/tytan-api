@@ -2,6 +2,8 @@ package user
 
 import (
 	"database/sql"
+
+	hashUtil "tytan-api/util/hash"
 )
 
 type UserRepository struct {
@@ -12,8 +14,50 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 	return &UserRepository{DB: db}
 }
 
-func (r *UserRepository) List() ([]*User, error) {
-	rows, err := r.DB.Query("SELECT id, username, password, created_at FROM user")
+func (r *UserRepository) Create(user *User) error {
+	password, err := hashUtil.Hash(user.Password)
+	if err != nil {
+		return err
+	}
+
+	if _, err := r.DB.Exec(
+		"INSERT INTO users (username, password, created_at) VALUES (?, ?, ?)",
+		user.Username,
+		password,
+		user.CreatedAt,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *UserRepository) Update(id int, user *User) error {
+	password, err := hashUtil.Hash(user.Password)
+	if err != nil {
+		return err
+	}
+
+	if _, err := r.DB.Exec(
+		"UPDATE users SET username = ?, password = ?, created_at = ? WHERE id = ?",
+		user.Username,
+		password,
+		user.CreatedAt,
+		id,
+	); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *UserRepository) Delete(id int) error {
+	_, err := r.DB.Exec("DELETE FROM users WHERE id = ?", id)
+	return err
+}
+
+func (r *UserRepository) FindAll() ([]*User, error) {
+	rows, err := r.DB.Query("SELECT id, username, password, created_at FROM users")
 	if err != nil {
 		return nil, err
 	}
@@ -30,40 +74,44 @@ func (r *UserRepository) List() ([]*User, error) {
 	return users, nil
 }
 
-func (r *UserRepository) Create(user *User) error {
-	_, err := r.DB.Exec(
-		"INSERT INTO user (username, password, created_at) VALUES (?, ?, ?)",
-		user.Username,
-		user.Password,
-		user.CreatedAt,
-	)
+func (r *UserRepository) FindById(id int) (*User, error) {
+	row := r.DB.QueryRow("SELECT id, username, password, created_at FROM users WHERE id = ?", id)
 
-	return err
-}
-
-func (r *UserRepository) Read(id int) (*User, error) {
-	row := r.DB.QueryRow("SELECT id, username, password, created_at FROM user WHERE id = ?", id)
 	user := &User{}
-	err := row.Scan(&user.ID, &user.Username, &user.Password, &user.CreatedAt)
-	if err != nil {
+	if err := row.Scan(&user.ID, &user.Username, &user.Password, &user.CreatedAt); err != nil {
 		return nil, err
 	}
 
 	return user, nil
 }
 
-func (r *UserRepository) Update(id int, user *User) error {
-	_, err := r.DB.Exec(
-		"UPDATE user SET username = ?, password = ?, created_at = ? WHERE id = ?",
-		user.Username,
-		user.Password,
-		user.CreatedAt,
-		id,
-	)
-	return err
+func (r *UserRepository) FindByUsername(username string) (*User, error) {
+	row := r.DB.QueryRow("SELECT * FROM users WHERE username = ?", username)
+
+	user := &User{}
+	if err := row.Scan(&user.ID, &user.Username, &user.Password, &user.CreatedAt); err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
-func (r *UserRepository) Delete(id int) error {
-	_, err := r.DB.Exec("DELETE FROM user WHERE id = ?", id)
-	return err
+func (r *UserRepository) FindByCredentials(username string, password string) (*User, error) {
+	password, err := hashUtil.Hash(password)
+	if err != nil {
+		return nil, err
+	}
+
+	row := r.DB.QueryRow(
+		"SELECT id, username, password, created_at FROM users WHERE username = ? AND password = ?",
+		username,
+		password,
+	)
+
+	user := &User{}
+	if err := row.Scan(&user.ID, &user.Username, &user.Password, &user.CreatedAt); err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }

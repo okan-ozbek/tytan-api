@@ -37,7 +37,7 @@ func NewUserHandler(validator *validator.Validate, database *sql.DB) *API {
 func (a *API) List(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	users, err := a.repository.List()
+	users, err := a.repository.FindAll()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("Failed to retrieve users")

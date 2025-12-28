@@ -15,14 +15,14 @@ import (
 type API struct {
 	validator  *validator.Validate
 	repository *FoodRepository
-	db         *sql.DB
+	database   *sql.DB
 }
 
-func NewFoodHandler(validator *validator.Validate, db *sql.DB) *API {
+func NewFoodHandler(validator *validator.Validate, database *sql.DB) *API {
 	return &API{
 		validator:  validator,
-		repository: NewFoodRepository(db),
-		db:         db,
+		repository: NewFoodRepository(database),
+		database:   database,
 	}
 }
 
