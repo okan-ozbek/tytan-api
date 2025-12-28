@@ -8,8 +8,8 @@ import (
 
 	validatorUtil "tytan-api/util/validator"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
-	"github.com/gorilla/mux"
 )
 
 type API struct {
@@ -107,7 +107,7 @@ func (a *API) Create(w http.ResponseWriter, r *http.Request) {
 func (a *API) Read(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Invalid food ID")
@@ -147,7 +147,7 @@ func (a *API) Read(w http.ResponseWriter, r *http.Request) {
 func (a *API) Update(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Invalid food ID")
@@ -185,7 +185,7 @@ func (a *API) Update(w http.ResponseWriter, r *http.Request) {
 func (a *API) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode("Invalid food ID")

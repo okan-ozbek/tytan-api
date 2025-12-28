@@ -6,29 +6,44 @@ import (
 	"tytan-api/api/resource/health"
 	"tytan-api/api/resource/user"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
-
-	"github.com/gorilla/mux"
 )
 
-func NewRouter(validator *validator.Validate, db *sql.DB) *mux.Router {
-	r := mux.NewRouter()
+func NewRouter(validator *validator.Validate, database *sql.DB) *chi.Mux {
+	router := chi.NewRouter()
 
-	r.HandleFunc("/health", health.Check).Methods("GET")
+	router.Route("/api", func(router chi.Router) {
+		router.Get("/health", health.Check)
 
-	userHandler := user.NewUserHandler(validator, db)
-	r.HandleFunc("/users", userHandler.List).Methods("GET")
-	r.HandleFunc("/users/{id}", userHandler.Read).Methods("GET")
-	r.HandleFunc("/users", userHandler.Create).Methods("POST")
-	r.HandleFunc("/users/{id}", userHandler.Update).Methods("PUT")
-	r.HandleFunc("/users/{id}", userHandler.Delete).Methods("DELETE")
+		router.Route("/v1", func(router chi.Router) {
+			router.Route("/users", func(router chi.Router) {
+				userHandler := user.NewUserHandler(validator, database)
 
-	foodHandler := food.NewFoodHandler(validator, db)
-	r.HandleFunc("/foods", foodHandler.List).Methods("GET")
-	r.HandleFunc("/foods/{id}", foodHandler.Read).Methods("GET")
-	r.HandleFunc("/foods", foodHandler.Create).Methods("POST")
-	r.HandleFunc("/foods/{id}", foodHandler.Update).Methods("PUT")
-	r.HandleFunc("/foods/{id}", foodHandler.Delete).Methods("DELETE")
+				router.Get("/", userHandler.List)
+				router.Post("/", userHandler.Create)
 
-	return r
+				router.Route("/{id}", func(r chi.Router) {
+					router.Get("/", userHandler.Read)
+					router.Put("/", userHandler.Update)
+					router.Delete("/", userHandler.Delete)
+				})
+			})
+
+			router.Route("/foods", func(router chi.Router) {
+				foodHandler := food.NewFoodHandler(validator, database)
+
+				router.Get("/", foodHandler.List)
+				router.Post("/", foodHandler.Create)
+
+				router.Route("/{id}", func(router chi.Router) {
+					router.Get("/", foodHandler.Read)
+					router.Put("/", foodHandler.Update)
+					router.Delete("/", foodHandler.Delete)
+				})
+			})
+		})
+	})
+
+	return router
 }
