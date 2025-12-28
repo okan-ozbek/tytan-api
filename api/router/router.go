@@ -8,13 +8,10 @@ import (
 	"tytan-api/api/router/middleware"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/jwtauth/v5"
 	"github.com/go-playground/validator/v10"
 )
 
 func NewRouter(validator *validator.Validate, database *sql.DB) *chi.Mux {
-	tokenAuth := jwtauth.New("HS256", []byte("secret"), nil)
-
 	router := chi.NewRouter()
 	router.Route("/api", func(router chi.Router) {
 		router.Use(middleware.ContentTypeJSON)
@@ -25,9 +22,6 @@ func NewRouter(validator *validator.Validate, database *sql.DB) *chi.Mux {
 
 			// Protected routes
 			router.Group(func(router chi.Router) {
-				router.Use(jwtauth.Verifier(tokenAuth))
-				router.Use(jwtauth.Authenticator(tokenAuth))
-
 				userHandler := user.NewUserHandler(validator, database)
 
 				router.Get("/users", userHandler.List)

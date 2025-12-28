@@ -5,14 +5,12 @@ import (
 	"net/http"
 	"tytan-api/api/router"
 	"tytan-api/config"
-	"tytan-api/util/auth"
 	"tytan-api/util/validator"
 
 	_ "modernc.org/sqlite"
 )
 
 func main() {
-	auth.NewAuth()
 	config := config.LoadConfig()
 
 	// db, err := sql.Open("sqlite", "file:database.db?cache=shared")

@@ -15,14 +15,14 @@ import (
 type API struct {
 	validator  *validator.Validate
 	repository *UserRepository
-	db         *sql.DB
+	database   *sql.DB
 }
 
-func NewUserHandler(validator *validator.Validate, db *sql.DB) *API {
+func NewUserHandler(validator *validator.Validate, database *sql.DB) *API {
 	return &API{
 		validator:  validator,
-		repository: NewUserRepository(db),
-		db:         db,
+		repository: NewUserRepository(database),
+		database:   database,
 	}
 }
 
@@ -76,7 +76,11 @@ func (a *API) Create(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	userForm := &UserForm{}
-	_ = json.NewDecoder(r.Body).Decode(&userForm)
+	if err := json.NewDecoder(r.Body).Decode(&userForm); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(validatorUtil.ToErrResponse(err))
+		return
+	}
 
 	if err := a.validator.Struct(userForm); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
