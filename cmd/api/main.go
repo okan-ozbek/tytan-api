@@ -22,7 +22,25 @@ func main() {
 		panic(err)
 	}
 
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY, username TEXT, password TEXT, created_at DATETIME);`)
+	_, err = db.Exec(
+		`CREATE TABLE IF NOT EXISTS user (
+			id INTEGER PRIMARY KEY, 
+			username TEXT, 
+			password TEXT, 
+			created_at DATETIME
+		);`)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = db.Exec(`
+		CREATE IF EXISTS TABLE foods (
+			id AUTOINCREMENT PRIMARY KEY,
+			name VARCHAR(100) NOT NULL,
+			description TEXT,
+			created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+			updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+		);`)
 	if err != nil {
 		panic(err)
 	}
