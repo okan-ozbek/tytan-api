@@ -2,7 +2,6 @@ package router
 
 import (
 	"database/sql"
-	"tytan-api/internal/resource/food"
 	"tytan-api/internal/resource/health"
 	"tytan-api/internal/resource/user"
 	"tytan-api/internal/router/middleware"
@@ -19,8 +18,12 @@ func NewRouter(validator *validator.Validate, database *sql.DB) *chi.Mux {
 		router.Get("/health", health.Check)
 
 		router.Route("/v1", func(router chi.Router) {
+			// Guest routes
+			router.Group(func(router chi.Router) {
+				//
+			})
 
-			// Protected routes
+			// Authenticated routes
 			router.Group(func(router chi.Router) {
 				userHandler := user.NewUserHandler(validator, database)
 
@@ -29,14 +32,6 @@ func NewRouter(validator *validator.Validate, database *sql.DB) *chi.Mux {
 				router.Get("/users/{id:[0-9]+}", userHandler.Read)
 				router.Put("/users/{id:[0-9]+}", userHandler.Update)
 				router.Delete("/users/{id:[0-9]+}", userHandler.Delete)
-
-				foodHandler := food.NewFoodHandler(validator, database)
-
-				router.Get("/foods", foodHandler.List)
-				router.Post("/foods", foodHandler.Create)
-				router.Get("/foods/{id:[0-9]+}", foodHandler.Read)
-				router.Put("/foods/{id:[0-9]+}", foodHandler.Update)
-				router.Delete("/foods/{id:[0-9]+}", foodHandler.Delete)
 			})
 		})
 	})

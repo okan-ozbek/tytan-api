@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"net/http"
-	"tytan-api/config"
 	"tytan-api/internal/router"
 	"tytan-api/internal/util/validator"
 
@@ -11,10 +10,10 @@ import (
 )
 
 func main() {
-	config := config.LoadConfig()
+	// config := config.LoadConfig()
 
-	// db, err := sql.Open("sqlite", "file:database.db?cache=shared")
-	db, err := sql.Open(config.Database.Driver, "file:"+config.Database.Host+"?mode=memory&cache=shared")
+	db, err := sql.Open("sqlite", "file:database.db?cache=shared")
+	// db, err := sql.Open(config.Database.Driver, "file:"+config.Database.Host+"?mode=memory&cache=shared")
 	if err != nil {
 		panic(err)
 	}
@@ -23,23 +22,25 @@ func main() {
 		panic(err)
 	}
 
-	_, err = db.Exec(
-		`CREATE TABLE IF NOT EXISTS users (
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS users (
 			id INTEGER PRIMARY KEY, 
-			username TEXT, 
-			password TEXT, 
-			created_at DATETIME
-		);`)
-	if err != nil {
-		panic(err)
-	}
+			
+			username TEXT NOT NULL,
+			email TEXT NOT NULL, 
+			password TEXT NOT NULL, 
+			created_at DATETIME NOT NULL DEFAULT (datetime('now')),
+			updated_at DATETIME NOT NULL DEFAULT (datetime('now')),
 
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS foods (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		name TEXT,
-		description TEXT,
-		created_at DATETIME
-	);`)
+			UNIQUE (id),
+			UNIQUE (username),
+			UNIQUE (email)
+		);
+
+		CREATE INDEX IF NOT EXISTS idx_credentials_username ON users (username, password);
+		CREATE INDEX IF NOT EXISTS idx_credentials_email ON users (email, password);
+		CREATE INDEX IF NOT EXISTS idx_id ON users (id);
+	`)
 	if err != nil {
 		panic(err)
 	}

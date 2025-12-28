@@ -35,8 +35,6 @@ func NewUserHandler(validator *validator.Validate, database *sql.DB) *API {
 // @Failure      500  {string}  string "Failed to retrieve users"
 // @Router       /users [get]
 func (a *API) List(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	users, err := a.repository.FindAll()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -73,8 +71,6 @@ func (a *API) List(w http.ResponseWriter, r *http.Request) {
 // @Failure      400   {string}  string    "Failed to create user"
 // @Router       /users [post]
 func (a *API) Create(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	userForm := &UserForm{}
 	if err := json.NewDecoder(r.Body).Decode(&userForm); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -108,8 +104,6 @@ func (a *API) Create(w http.ResponseWriter, r *http.Request) {
 // @Failure      404  {string}  string  "User not found"
 // @Router       /users/{id} [get]
 func (a *API) Read(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -147,8 +141,6 @@ func (a *API) Read(w http.ResponseWriter, r *http.Request) {
 // @Failure      500   {string}  string    "Failed to update user"
 // @Router       /users/{id} [put]
 func (a *API) Update(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -185,8 +177,6 @@ func (a *API) Update(w http.ResponseWriter, r *http.Request) {
 // @Failure      500  {string}  string  "Failed to delete user"
 // @Router       /users/{id} [delete]
 func (a *API) Delete(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
