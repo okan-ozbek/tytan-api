@@ -20,11 +20,20 @@ func NewRouter(validator *validator.Validate, database *sql.DB) *chi.Mux {
 		router.Route("/v1", func(router chi.Router) {
 			// Guest routes
 			router.Group(func(router chi.Router) {
+				// Middlewares
 				//
+
+				// router.Post("/auth/login", handler)
 			})
 
 			// Authenticated routes
 			router.Group(func(router chi.Router) {
+				// Middlewares
+				//
+
+				// router.Post("/auth/logout", handler)
+				// router.Post("/auth/refresh", handler)
+
 				userHandler := user.NewUserHandler(validator, database)
 
 				router.Get("/users", userHandler.List)

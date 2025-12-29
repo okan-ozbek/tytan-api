@@ -3,7 +3,7 @@ package validator_test
 import (
 	"testing"
 
-	"tytan-api/util/validator"
+	"tytan-api/internal/util/validator"
 )
 
 type testCase struct {
