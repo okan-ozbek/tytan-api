@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 
-	validatorUtil "tytan-api/util/validator"
+	validatorUtil "tytan-api/internal/util/validator"
 )
 
 type API struct {
